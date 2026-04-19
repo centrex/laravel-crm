@@ -2,13 +2,13 @@
 
 declare(strict_types = 1);
 
-namespace VendorName\Skeleton\Commands;
+namespace Centrex\Crm\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class CrmCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-crm';
 
     public $description = 'My command';
 
