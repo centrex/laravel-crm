@@ -4,7 +4,8 @@ declare(strict_types = 1);
 
 namespace Centrex\Crm;
 
-use Centrex\Crm\Commands\CrmCommand;
+use Centrex\Crm\Commands\{CalculateClvCommand, CrmCommand, ScoreLeadsCommand};
+use Centrex\Crm\Services\ClvCalculator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -17,6 +18,10 @@ class CrmServiceProvider extends ServiceProvider
 
         if ((bool) config('crm.web_enabled', true)) {
             $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        }
+
+        if ((bool) config('crm.api_enabled', true)) {
+            $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
         }
 
         $this->registerGates();
@@ -36,6 +41,8 @@ class CrmServiceProvider extends ServiceProvider
 
             $this->commands([
                 CrmCommand::class,
+                CalculateClvCommand::class,
+                ScoreLeadsCommand::class,
             ]);
         }
     }
@@ -44,8 +51,10 @@ class CrmServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'crm');
 
-        $this->app->singleton('crm', fn (): Crm => new Crm());
-        $this->app->singleton(Crm::class, fn (): Crm => new Crm());
+        $this->app->singleton(ClvCalculator::class, fn (): ClvCalculator => new ClvCalculator());
+
+        $this->app->singleton('crm', fn (): Crm => new Crm($this->app->make(ClvCalculator::class)));
+        $this->app->singleton(Crm::class, fn (): Crm => new Crm($this->app->make(ClvCalculator::class)));
     }
 
     protected function registerGates(): void
@@ -56,8 +65,13 @@ class CrmServiceProvider extends ServiceProvider
             'crm.leads.manage',
             'crm.deals.view',
             'crm.deals.manage',
+            'crm.contacts.view',
+            'crm.contacts.manage',
+            'crm.companies.view',
+            'crm.companies.manage',
             'crm.activities.view',
             'crm.activities.manage',
+            'crm.clv.view',
         ];
 
         foreach ($abilities as $ability) {

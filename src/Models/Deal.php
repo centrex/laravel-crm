@@ -4,14 +4,16 @@ declare(strict_types = 1);
 
 namespace Centrex\Crm\Models;
 
-use Centrex\Crm\Concerns\AddTablePrefix;
+use Centrex\Crm\Concerns\{AddTablePrefix, HasActivities, HasTags};
 use Centrex\Crm\Enums\DealStage;
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
-use Illuminate\Database\Eloquent\Relations\{BelongsTo, MorphMany};
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Deal extends Model
 {
     use AddTablePrefix;
+    use HasActivities;
+    use HasTags;
     use SoftDeletes;
 
     protected function getTableSuffix(): string
@@ -67,11 +69,6 @@ class Deal extends Model
     public function contact(): BelongsTo
     {
         return $this->belongsTo(Contact::class);
-    }
-
-    public function activities(): MorphMany
-    {
-        return $this->morphMany(Activity::class, 'subject');
     }
 
     public function isClosed(): bool

@@ -41,6 +41,9 @@ class TestCase extends Orchestra
             'database' => ':memory:',
             'prefix'   => '',
         ]);
+        config()->set('crm.drivers.database.connection', 'testing');
         config()->set('crm.web_middleware', ['web']);
+        config()->set('crm.api_middleware', ['api']);
+        config()->set('crm.api_enabled', false);
     }
 }

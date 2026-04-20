@@ -4,15 +4,22 @@ declare(strict_types = 1);
 
 namespace Centrex\Crm;
 
-use Centrex\Crm\Enums\{DealStage, LeadStatus};
+use Centrex\Crm\Enums\{DealStage, LeadSource, LeadStatus};
 use Centrex\Crm\Exceptions\{InvalidDealStageTransition, InvalidLeadStatusTransition};
-use Centrex\Crm\Models\{Activity, Deal, Lead};
+use Centrex\Crm\Models\{Activity, ClvSnapshot, Contact, Deal, Lead};
+use Centrex\Crm\Services\ClvCalculator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class Crm
 {
+    public function __construct(private readonly ClvCalculator $clvCalculator = new ClvCalculator()) {}
+
+    /* -------------------------
+     * Lead lifecycle
+     * ------------------------- */
+
     public function createLead(array $attributes): Lead
     {
         $attributes['code'] ??= $this->nextCode('LEAD');
@@ -75,6 +82,10 @@ class Crm
         return $lead->refresh();
     }
 
+    /* -------------------------
+     * Deal pipeline
+     * ------------------------- */
+
     public function advanceDealStage(Deal $deal, DealStage|string $targetStage): Deal
     {
         $targetStage = $targetStage instanceof DealStage ? $targetStage : DealStage::from($targetStage);
@@ -118,10 +129,15 @@ class Crm
         return $deal->refresh();
     }
 
+    /* -------------------------
+     * Activity logging
+     * ------------------------- */
+
     public function logActivity(Model $subject, array $attributes): Activity
     {
         return $subject->morphMany(Activity::class, 'subject')->create([
             'type'         => $attributes['type'] ?? 'note',
+            'priority'     => $attributes['priority'] ?? 'normal',
             'summary'      => $attributes['summary'] ?? 'Follow up',
             'description'  => $attributes['description'] ?? null,
             'due_at'       => $attributes['due_at'] ?? null,
@@ -130,6 +146,90 @@ class Crm
             'meta'         => $attributes['meta'] ?? null,
         ]);
     }
+
+    /* -------------------------
+     * CLV Calculation
+     * ------------------------- */
+
+    public function calculateClv(Contact $contact, int $horizonMonths = 12): ClvSnapshot
+    {
+        $transactions = $contact->wonDealsAsTransactions();
+        $result = $this->clvCalculator->calculate($transactions, $horizonMonths);
+
+        return ClvSnapshot::query()->updateOrCreate(
+            ['contact_id' => $contact->id, 'horizon_months' => $horizonMonths],
+            array_merge($result, ['calculated_at' => now()]),
+        );
+    }
+
+    public function recalculateAllClv(int $horizonMonths = 12): int
+    {
+        $count = 0;
+
+        Contact::query()->each(function (Contact $contact) use ($horizonMonths, &$count): void {
+            $this->calculateClv($contact, $horizonMonths);
+            $count++;
+        });
+
+        return $count;
+    }
+
+    public function getClvLeaderboard(int $limit = 10, int $horizonMonths = 12): Collection
+    {
+        return ClvSnapshot::query()
+            ->where('horizon_months', $horizonMonths)
+            ->with('contact')
+            ->orderByDesc('clv_value')
+            ->limit($limit)
+            ->get();
+    }
+
+    /* -------------------------
+     * Lead scoring
+     * ------------------------- */
+
+    public function scoreLead(Lead $lead): Lead
+    {
+        $score = 0;
+
+        $value = (float) $lead->value;
+        $score += match (true) {
+            $value >= 500000 => 30,
+            $value >= 100000 => 20,
+            $value >= 50000  => 15,
+            $value >= 10000  => 10,
+            default          => 5,
+        };
+
+        $score += min(20, (int) $lead->probability / 5);
+
+        $sourceBonus = match ($lead->source) {
+            LeadSource::Referral  => 20,
+            LeadSource::Partner   => 15,
+            LeadSource::Event     => 10,
+            LeadSource::Web       => 8,
+            LeadSource::SocialMedia => 5,
+            default               => 0,
+        };
+        $score += $sourceBonus;
+
+        $activityCount = $lead->activities()->count();
+        $score += min(15, $activityCount * 3);
+
+        $score += match (true) {
+            $lead->company_id !== null && $lead->contact_id !== null => 10,
+            $lead->company_id !== null || $lead->contact_id !== null => 5,
+            default                                                   => 0,
+        };
+
+        $lead->forceFill(['score' => min(100, $score)])->save();
+
+        return $lead->refresh();
+    }
+
+    /* -------------------------
+     * Reporting & analytics
+     * ------------------------- */
 
     public function getPipelineSummary(): array
     {
@@ -177,6 +277,102 @@ class Crm
             ->all();
     }
 
+    public function getConversionRates(): array
+    {
+        $totalLeads = Lead::query()->count();
+        $qualifiedLeads = Lead::query()->where('status', LeadStatus::Qualified->value)->count();
+        $lostLeads = Lead::query()->where('status', LeadStatus::Lost->value)->count();
+        $wonDeals = Deal::query()->where('stage', DealStage::Won->value)->count();
+        $totalDeals = Deal::query()->count();
+
+        return [
+            'lead_to_qualified'  => $totalLeads > 0 ? round($qualifiedLeads / $totalLeads * 100, 1) : 0.0,
+            'lead_to_lost'       => $totalLeads > 0 ? round($lostLeads / $totalLeads * 100, 1) : 0.0,
+            'deal_win_rate'      => $totalDeals > 0 ? round($wonDeals / $totalDeals * 100, 1) : 0.0,
+            'total_leads'        => $totalLeads,
+            'qualified_leads'    => $qualifiedLeads,
+            'lost_leads'         => $lostLeads,
+            'won_deals'          => $wonDeals,
+            'total_deals'        => $totalDeals,
+        ];
+    }
+
+    public function getRevenueForecast(int $months = 3): array
+    {
+        $activeDealStages = [
+            DealStage::Qualified->value,
+            DealStage::Proposal->value,
+            DealStage::Negotiation->value,
+        ];
+
+        $deals = Deal::query()
+            ->whereIn('stage', $activeDealStages)
+            ->whereNotNull('expected_close_date')
+            ->where('expected_close_date', '<=', now()->addMonths($months))
+            ->get();
+
+        $forecast = [];
+
+        for ($i = 1; $i <= $months; $i++) {
+            $monthStart = now()->startOfMonth()->addMonths($i - 1);
+            $monthEnd = now()->startOfMonth()->addMonths($i)->subDay();
+
+            $monthDeals = $deals->filter(static fn (Deal $deal): bool => $deal->expected_close_date->between($monthStart, $monthEnd));
+
+            $forecast[] = [
+                'month'              => $monthStart->format('Y-m'),
+                'deal_count'         => $monthDeals->count(),
+                'expected_revenue'   => round($monthDeals->sum('amount'), 2),
+                'weighted_revenue'   => round($monthDeals->sum(static fn (Deal $d): float => (float) $d->amount * $d->probability / 100), 2),
+            ];
+        }
+
+        return $forecast;
+    }
+
+    public function getTopOwners(int $limit = 5): Collection
+    {
+        return Deal::query()
+            ->selectRaw('owner_id, COUNT(*) as deal_count, SUM(amount) as total_amount, SUM(CASE WHEN stage = ? THEN 1 ELSE 0 END) as won_count', [DealStage::Won->value])
+            ->whereNotNull('owner_id')
+            ->groupBy('owner_id')
+            ->orderByDesc('won_count')
+            ->limit($limit)
+            ->get();
+    }
+
+    /* -------------------------
+     * Search
+     * ------------------------- */
+
+    public function searchContacts(string $query, int $limit = 20): Collection
+    {
+        return Contact::query()
+            ->with('company')
+            ->where(static function ($q) use ($query): void {
+                $q->where('first_name', 'like', "%{$query}%")
+                    ->orWhere('last_name', 'like', "%{$query}%")
+                    ->orWhere('email', 'like', "%{$query}%");
+            })
+            ->limit($limit)
+            ->get();
+    }
+
+    public function searchCompanies(string $query, int $limit = 20): Collection
+    {
+        return \Centrex\Crm\Models\Company::query()
+            ->where(static function ($q) use ($query): void {
+                $q->where('name', 'like', "%{$query}%")
+                    ->orWhere('email', 'like', "%{$query}%");
+            })
+            ->limit($limit)
+            ->get();
+    }
+
+    /* -------------------------
+     * Activity helpers
+     * ------------------------- */
+
     public function upcomingActivities(int $limit = 5): Collection
     {
         return Activity::query()
@@ -186,6 +382,20 @@ class Crm
             ->limit($limit)
             ->get();
     }
+
+    public function getOverdueActivities(): Collection
+    {
+        return Activity::query()
+            ->whereNull('completed_at')
+            ->whereNotNull('due_at')
+            ->where('due_at', '<', now())
+            ->orderBy('due_at')
+            ->get();
+    }
+
+    /* -------------------------
+     * Private helpers
+     * ------------------------- */
 
     private function nextCode(string $prefix): string
     {

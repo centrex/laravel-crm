@@ -17,6 +17,12 @@ return [
 
     'web_middleware' => ['web', 'auth'],
 
+    'api_enabled' => env('CRM_API_ENABLED', true),
+
+    'api_prefix' => env('CRM_API_PREFIX', 'api/crm'),
+
+    'api_middleware' => ['api', 'auth:sanctum'],
+
     'user_foreign_keys' => env('CRM_USER_FOREIGN_KEYS', false),
 
     'admin_role_attribute' => env('CRM_ADMIN_ROLE_ATTRIBUTE'),
@@ -25,4 +31,8 @@ return [
         static fn (string $role): string => trim($role),
         explode(',', (string) env('CRM_ADMIN_ROLES', 'admin,crm-admin')),
     ))),
+
+    'clv_horizon_months' => env('CRM_CLV_HORIZON_MONTHS', 12),
+
+    'clv_discount_rate' => env('CRM_CLV_DISCOUNT_RATE', 0.1),
 ];

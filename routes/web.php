@@ -13,7 +13,11 @@ Route::middleware(config('crm.web_middleware', ['web', 'auth']))
             return view('crm::dashboard', [
                 'summary'            => $crm->getPipelineSummary(),
                 'dealsByStage'       => $crm->dealsByStage(),
-                'upcomingActivities' => $crm->upcomingActivities(),
+                'upcomingActivities' => $crm->upcomingActivities(8),
+                'overdueActivities'  => $crm->getOverdueActivities(),
+                'conversionRates'    => $crm->getConversionRates(),
+                'forecast'           => $crm->getRevenueForecast(3),
+                'clvLeaderboard'     => $crm->getClvLeaderboard(5),
             ]);
         })->name('dashboard');
     });

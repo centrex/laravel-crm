@@ -4,14 +4,16 @@ declare(strict_types = 1);
 
 namespace Centrex\Crm\Models;
 
-use Centrex\Crm\Concerns\AddTablePrefix;
-use Centrex\Crm\Enums\LeadStatus;
+use Centrex\Crm\Concerns\{AddTablePrefix, HasActivities, HasTags};
+use Centrex\Crm\Enums\{LeadSource, LeadStatus};
 use Illuminate\Database\Eloquent\{Model, SoftDeletes};
 use Illuminate\Database\Eloquent\Relations\{BelongsTo, HasMany};
 
 class Lead extends Model
 {
     use AddTablePrefix;
+    use HasActivities;
+    use HasTags;
     use SoftDeletes;
 
     protected function getTableSuffix(): string
@@ -36,6 +38,7 @@ class Lead extends Model
         'currency',
         'status',
         'probability',
+        'score',
         'owner_id',
         'next_follow_up_at',
         'qualified_at',
@@ -47,11 +50,13 @@ class Lead extends Model
     protected $casts = [
         'value'             => 'decimal:2',
         'probability'       => 'integer',
+        'score'             => 'integer',
         'next_follow_up_at' => 'datetime',
         'qualified_at'      => 'datetime',
         'lost_at'           => 'datetime',
         'meta'              => 'array',
         'status'            => LeadStatus::class,
+        'source'            => LeadSource::class,
     ];
 
     public function company(): BelongsTo
