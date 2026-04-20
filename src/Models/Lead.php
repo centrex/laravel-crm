@@ -45,13 +45,13 @@ class Lead extends Model
     ];
 
     protected $casts = [
-        'value' => 'decimal:2',
-        'probability' => 'integer',
+        'value'             => 'decimal:2',
+        'probability'       => 'integer',
         'next_follow_up_at' => 'datetime',
-        'qualified_at' => 'datetime',
-        'lost_at' => 'datetime',
-        'meta' => 'array',
-        'status' => LeadStatus::class,
+        'qualified_at'      => 'datetime',
+        'lost_at'           => 'datetime',
+        'meta'              => 'array',
+        'status'            => LeadStatus::class,
     ];
 
     public function company(): BelongsTo

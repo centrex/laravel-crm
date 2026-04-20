@@ -11,8 +11,8 @@ Route::middleware(config('crm.web_middleware', ['web', 'auth']))
     ->group(function (): void {
         Route::get('/', function (Crm $crm) {
             return view('crm::dashboard', [
-                'summary' => $crm->getPipelineSummary(),
-                'dealsByStage' => $crm->dealsByStage(),
+                'summary'            => $crm->getPipelineSummary(),
+                'dealsByStage'       => $crm->dealsByStage(),
                 'upcomingActivities' => $crm->upcomingActivities(),
             ]);
         })->name('dashboard');

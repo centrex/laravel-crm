@@ -36,10 +36,10 @@ class Activity extends Model
     ];
 
     protected $casts = [
-        'type' => ActivityType::class,
-        'due_at' => 'datetime',
+        'type'         => ActivityType::class,
+        'due_at'       => 'datetime',
         'completed_at' => 'datetime',
-        'meta' => 'array',
+        'meta'         => 'array',
     ];
 
     public function subject(): MorphTo

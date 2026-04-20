@@ -30,23 +30,23 @@ class Crm
 
         return DB::connection($lead->getConnectionName())->transaction(function () use ($lead, $dealAttributes): Deal {
             $deal = Deal::query()->create([
-                'code' => $dealAttributes['code'] ?? $this->nextCode('DEAL'),
-                'lead_id' => $lead->id,
-                'company_id' => $dealAttributes['company_id'] ?? $lead->company_id,
-                'contact_id' => $dealAttributes['contact_id'] ?? $lead->contact_id,
-                'name' => $dealAttributes['name'] ?? $lead->title,
-                'stage' => $dealAttributes['stage'] ?? DealStage::Qualified->value,
-                'amount' => $dealAttributes['amount'] ?? $lead->value,
-                'currency' => $dealAttributes['currency'] ?? $lead->currency,
-                'probability' => $dealAttributes['probability'] ?? max($lead->probability, 20),
+                'code'                => $dealAttributes['code'] ?? $this->nextCode('DEAL'),
+                'lead_id'             => $lead->id,
+                'company_id'          => $dealAttributes['company_id'] ?? $lead->company_id,
+                'contact_id'          => $dealAttributes['contact_id'] ?? $lead->contact_id,
+                'name'                => $dealAttributes['name'] ?? $lead->title,
+                'stage'               => $dealAttributes['stage'] ?? DealStage::Qualified->value,
+                'amount'              => $dealAttributes['amount'] ?? $lead->value,
+                'currency'            => $dealAttributes['currency'] ?? $lead->currency,
+                'probability'         => $dealAttributes['probability'] ?? max($lead->probability, 20),
                 'expected_close_date' => $dealAttributes['expected_close_date'] ?? null,
-                'owner_id' => $dealAttributes['owner_id'] ?? $lead->owner_id,
-                'notes' => $dealAttributes['notes'] ?? $lead->notes,
-                'meta' => $dealAttributes['meta'] ?? $lead->meta,
+                'owner_id'            => $dealAttributes['owner_id'] ?? $lead->owner_id,
+                'notes'               => $dealAttributes['notes'] ?? $lead->notes,
+                'meta'                => $dealAttributes['meta'] ?? $lead->meta,
             ]);
 
             $lead->forceFill([
-                'status' => LeadStatus::Qualified->value,
+                'status'       => LeadStatus::Qualified->value,
                 'qualified_at' => now(),
             ])->save();
 
@@ -67,9 +67,9 @@ class Crm
         }
 
         $lead->forceFill([
-            'status' => LeadStatus::Lost->value,
+            'status'  => LeadStatus::Lost->value,
             'lost_at' => now(),
-            'meta' => $meta,
+            'meta'    => $meta,
         ])->save();
 
         return $lead->refresh();
@@ -85,8 +85,8 @@ class Crm
         }
 
         $allowedTransitions = [
-            DealStage::Qualified->value => [DealStage::Proposal, DealStage::Lost],
-            DealStage::Proposal->value => [DealStage::Negotiation, DealStage::Lost],
+            DealStage::Qualified->value   => [DealStage::Proposal, DealStage::Lost],
+            DealStage::Proposal->value    => [DealStage::Negotiation, DealStage::Lost],
             DealStage::Negotiation->value => [DealStage::Won, DealStage::Lost],
         ];
 
@@ -105,11 +105,11 @@ class Crm
 
         $deal->stage = $targetStage;
         $deal->probability = match ($targetStage) {
-            DealStage::Proposal => max($deal->probability, 40),
+            DealStage::Proposal    => max($deal->probability, 40),
             DealStage::Negotiation => max($deal->probability, 70),
-            DealStage::Won => 100,
-            DealStage::Lost => 0,
-            default => $deal->probability,
+            DealStage::Won         => 100,
+            DealStage::Lost        => 0,
+            default                => $deal->probability,
         };
         $deal->won_at = $targetStage === DealStage::Won ? now() : $deal->won_at;
         $deal->lost_at = $targetStage === DealStage::Lost ? now() : $deal->lost_at;
@@ -121,13 +121,13 @@ class Crm
     public function logActivity(Model $subject, array $attributes): Activity
     {
         return $subject->morphMany(Activity::class, 'subject')->create([
-            'type' => $attributes['type'] ?? 'note',
-            'summary' => $attributes['summary'] ?? 'Follow up',
-            'description' => $attributes['description'] ?? null,
-            'due_at' => $attributes['due_at'] ?? null,
+            'type'         => $attributes['type'] ?? 'note',
+            'summary'      => $attributes['summary'] ?? 'Follow up',
+            'description'  => $attributes['description'] ?? null,
+            'due_at'       => $attributes['due_at'] ?? null,
             'completed_at' => $attributes['completed_at'] ?? null,
-            'owner_id' => $attributes['owner_id'] ?? null,
-            'meta' => $attributes['meta'] ?? null,
+            'owner_id'     => $attributes['owner_id'] ?? null,
+            'meta'         => $attributes['meta'] ?? null,
         ]);
     }
 
@@ -145,13 +145,13 @@ class Crm
             ->sum(static fn (Deal $deal): float => ((float) $deal->amount * $deal->probability) / 100);
 
         return [
-            'open_leads' => Lead::query()->where('status', LeadStatus::Open->value)->count(),
-            'qualified_leads' => Lead::query()->where('status', LeadStatus::Qualified->value)->count(),
-            'lost_leads' => Lead::query()->where('status', LeadStatus::Lost->value)->count(),
-            'active_deals' => Deal::query()->whereIn('stage', $activeDealStages)->count(),
-            'won_deals' => Deal::query()->where('stage', DealStage::Won->value)->count(),
-            'lost_deals' => Deal::query()->where('stage', DealStage::Lost->value)->count(),
-            'pipeline_value' => (float) Deal::query()->whereIn('stage', $activeDealStages)->sum('amount'),
+            'open_leads'              => Lead::query()->where('status', LeadStatus::Open->value)->count(),
+            'qualified_leads'         => Lead::query()->where('status', LeadStatus::Qualified->value)->count(),
+            'lost_leads'              => Lead::query()->where('status', LeadStatus::Lost->value)->count(),
+            'active_deals'            => Deal::query()->whereIn('stage', $activeDealStages)->count(),
+            'won_deals'               => Deal::query()->where('stage', DealStage::Won->value)->count(),
+            'lost_deals'              => Deal::query()->where('stage', DealStage::Lost->value)->count(),
+            'pipeline_value'          => (float) Deal::query()->whereIn('stage', $activeDealStages)->sum('amount'),
             'weighted_pipeline_value' => round($weightedPipelineValue, 2),
         ];
     }
@@ -170,8 +170,8 @@ class Crm
                 ELSE 99 END")
             ->get()
             ->map(static fn (Deal $deal): array => [
-                'stage' => $deal->stage->value,
-                'count' => (int) $deal->getAttribute('count'),
+                'stage'  => $deal->stage->value,
+                'count'  => (int) $deal->getAttribute('count'),
                 'amount' => (float) $deal->getAttribute('amount'),
             ])
             ->all();

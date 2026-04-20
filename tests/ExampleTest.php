@@ -11,9 +11,9 @@ it('creates and qualifies a lead into a deal', function () {
     $crm = app(Crm::class);
 
     $lead = $crm->createLead([
-        'title' => 'ERP rollout for Alpine Foods',
-        'source' => 'website',
-        'value' => 150000,
+        'title'       => 'ERP rollout for Alpine Foods',
+        'source'      => 'website',
+        'value'       => 150000,
         'probability' => 25,
     ]);
 
@@ -69,24 +69,24 @@ it('summarises pipeline value and logs activities', function () {
     $crm = app(Crm::class);
 
     $leadA = $crm->createLead([
-        'title' => 'Deal A',
-        'value' => 100000,
+        'title'       => 'Deal A',
+        'value'       => 100000,
         'probability' => 30,
     ]);
     $dealA = $crm->qualifyLead($leadA, ['probability' => 40]);
 
     $leadB = $crm->createLead([
-        'title' => 'Deal B',
-        'value' => 50000,
+        'title'       => 'Deal B',
+        'value'       => 50000,
         'probability' => 20,
     ]);
     $dealB = $crm->qualifyLead($leadB, ['probability' => 70]);
     $crm->advanceDealStage($dealB, DealStage::Proposal);
 
     $activity = $crm->logActivity($dealA, [
-        'type' => ActivityType::Call->value,
+        'type'    => ActivityType::Call->value,
         'summary' => 'Discovery call',
-        'due_at' => now()->addDay(),
+        'due_at'  => now()->addDay(),
     ]);
 
     $summary = $crm->getPipelineSummary();

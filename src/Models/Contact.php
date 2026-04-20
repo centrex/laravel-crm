@@ -39,7 +39,7 @@ class Contact extends Model
 
     protected $casts = [
         'is_primary' => 'boolean',
-        'meta' => 'array',
+        'meta'       => 'array',
     ];
 
     protected $appends = [

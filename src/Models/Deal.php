@@ -45,13 +45,13 @@ class Deal extends Model
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
-        'probability' => 'integer',
+        'amount'              => 'decimal:2',
+        'probability'         => 'integer',
         'expected_close_date' => 'date',
-        'won_at' => 'datetime',
-        'lost_at' => 'datetime',
-        'meta' => 'array',
-        'stage' => DealStage::class,
+        'won_at'              => 'datetime',
+        'lost_at'             => 'datetime',
+        'meta'                => 'array',
+        'stage'               => DealStage::class,
     ];
 
     public function lead(): BelongsTo
