@@ -204,12 +204,12 @@ class Crm
         $score += min(20, (int) $lead->probability / 5);
 
         $sourceBonus = match ($lead->source) {
-            LeadSource::Referral  => 20,
-            LeadSource::Partner   => 15,
-            LeadSource::Event     => 10,
-            LeadSource::Web       => 8,
+            LeadSource::Referral    => 20,
+            LeadSource::Partner     => 15,
+            LeadSource::Event       => 10,
+            LeadSource::Web         => 8,
             LeadSource::SocialMedia => 5,
-            default               => 0,
+            default                 => 0,
         };
         $score += $sourceBonus;
 
@@ -219,7 +219,7 @@ class Crm
         $score += match (true) {
             $lead->company_id !== null && $lead->contact_id !== null => 10,
             $lead->company_id !== null || $lead->contact_id !== null => 5,
-            default                                                   => 0,
+            default                                                  => 0,
         };
 
         $lead->forceFill(['score' => min(100, $score)])->save();
@@ -286,14 +286,14 @@ class Crm
         $totalDeals = Deal::query()->count();
 
         return [
-            'lead_to_qualified'  => $totalLeads > 0 ? round($qualifiedLeads / $totalLeads * 100, 1) : 0.0,
-            'lead_to_lost'       => $totalLeads > 0 ? round($lostLeads / $totalLeads * 100, 1) : 0.0,
-            'deal_win_rate'      => $totalDeals > 0 ? round($wonDeals / $totalDeals * 100, 1) : 0.0,
-            'total_leads'        => $totalLeads,
-            'qualified_leads'    => $qualifiedLeads,
-            'lost_leads'         => $lostLeads,
-            'won_deals'          => $wonDeals,
-            'total_deals'        => $totalDeals,
+            'lead_to_qualified' => $totalLeads > 0 ? round($qualifiedLeads / $totalLeads * 100, 1) : 0.0,
+            'lead_to_lost'      => $totalLeads > 0 ? round($lostLeads / $totalLeads * 100, 1) : 0.0,
+            'deal_win_rate'     => $totalDeals > 0 ? round($wonDeals / $totalDeals * 100, 1) : 0.0,
+            'total_leads'       => $totalLeads,
+            'qualified_leads'   => $qualifiedLeads,
+            'lost_leads'        => $lostLeads,
+            'won_deals'         => $wonDeals,
+            'total_deals'       => $totalDeals,
         ];
     }
 
@@ -320,10 +320,10 @@ class Crm
             $monthDeals = $deals->filter(static fn (Deal $deal): bool => $deal->expected_close_date->between($monthStart, $monthEnd));
 
             $forecast[] = [
-                'month'              => $monthStart->format('Y-m'),
-                'deal_count'         => $monthDeals->count(),
-                'expected_revenue'   => round($monthDeals->sum('amount'), 2),
-                'weighted_revenue'   => round($monthDeals->sum(static fn (Deal $d): float => (float) $d->amount * $d->probability / 100), 2),
+                'month'            => $monthStart->format('Y-m'),
+                'deal_count'       => $monthDeals->count(),
+                'expected_revenue' => round($monthDeals->sum('amount'), 2),
+                'weighted_revenue' => round($monthDeals->sum(static fn (Deal $d): float => (float) $d->amount * $d->probability / 100), 2),
             ];
         }
 
@@ -360,7 +360,7 @@ class Crm
 
     public function searchCompanies(string $query, int $limit = 20): Collection
     {
-        return \Centrex\Crm\Models\Company::query()
+        return Models\Company::query()
             ->where(static function ($q) use ($query): void {
                 $q->where('name', 'like', "%{$query}%")
                     ->orWhere('email', 'like', "%{$query}%");

@@ -28,16 +28,16 @@ class ClvCalculator
 
         usort($normalized, static fn (array $a, array $b): int => $a['date']->lt($b['date']) ? -1 : 1);
 
-        $first       = $normalized[0]['date'];
-        $last        = $normalized[count($normalized) - 1]['date'];
-        $now         = Carbon::now();
-        $n           = count($normalized);
+        $first = $normalized[0]['date'];
+        $last = $normalized[count($normalized) - 1]['date'];
+        $now = Carbon::now();
+        $n = count($normalized);
         $totalRevenue = (float) array_sum(array_column($normalized, 'amount'));
-        $avgValue    = $totalRevenue / $n;
+        $avgValue = $totalRevenue / $n;
 
-        $frequency    = max(0, $n - 1);
-        $recencyDays  = (float) $first->diffInDays($last);
-        $ageDays      = max(1.0, (float) $first->diffInDays($now));
+        $frequency = max(0, $n - 1);
+        $recencyDays = (float) $first->diffInDays($last);
+        $ageDays = max(1.0, (float) $first->diffInDays($now));
         $daysSinceLast = (float) $last->diffInDays($now);
 
         $avgInterval = $frequency > 0 ? $ageDays / $frequency : $ageDays;

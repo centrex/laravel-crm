@@ -9,7 +9,6 @@ Route::middleware(config('crm.api_middleware', ['api', 'auth:sanctum']))
     ->prefix(config('crm.api_prefix', 'api/crm'))
     ->name('crm.api.')
     ->group(function (): void {
-
         Route::apiResource('companies', CompanyController::class);
 
         Route::apiResource('contacts', ContactController::class);

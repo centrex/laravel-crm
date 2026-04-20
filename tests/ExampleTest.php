@@ -5,7 +5,7 @@ declare(strict_types = 1);
 use Centrex\Crm\Crm;
 use Centrex\Crm\Enums\{ActivityType, DealStage, LeadSource, LeadStatus};
 use Centrex\Crm\Exceptions\{InvalidDealStageTransition, InvalidLeadStatusTransition};
-use Centrex\Crm\Models\{Activity, ClvSnapshot, Company, Contact, Deal, Lead, Tag};
+use Centrex\Crm\Models\{ClvSnapshot, Company, Contact, Deal};
 
 it('creates and qualifies a lead into a deal', function () {
     $crm = app(Crm::class);
