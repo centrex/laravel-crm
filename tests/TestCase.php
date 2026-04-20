@@ -6,10 +6,15 @@ namespace Centrex\Crm\Tests;
 
 use Centrex\Crm\CrmServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Orchestra\Testbench\Attributes\WithWorkbench;
 use Orchestra\Testbench\TestCase as Orchestra;
 
+#[WithWorkbench]
 class TestCase extends Orchestra
 {
+    use RefreshDatabase;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -17,6 +22,8 @@ class TestCase extends Orchestra
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => 'Centrex\\Crm\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
         );
+
+        $this->artisan('migrate', ['--database' => 'testing'])->run();
     }
 
     protected function getPackageProviders($app)
@@ -26,13 +33,14 @@ class TestCase extends Orchestra
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    public function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
-
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_laravel-crm_table.php.stub';
-        $migration->up();
-        */
+        config()->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+        config()->set('crm.web_middleware', ['web']);
     }
 }

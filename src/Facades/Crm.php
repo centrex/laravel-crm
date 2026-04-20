@@ -13,6 +13,6 @@ class Crm extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \Centrex\Crm\Crm::class;
+        return 'crm';
     }
 }

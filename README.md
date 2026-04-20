@@ -1,11 +1,11 @@
-# This is my package laravel-crm
+# Laravel CRM
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/centrex/laravel-crm.svg?style=flat-square)](https://packagist.org/packages/centrex/laravel-crm)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/centrex/laravel-crm/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/centrex/laravel-crm/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/centrex/laravel-crm/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/centrex/laravel-crm/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/centrex/laravel-crm?style=flat-square)](https://packagist.org/packages/centrex/laravel-crm)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+A lightweight CRM foundation for Laravel apps with first-party support for companies, contacts, leads, deals, activities, and a simple dashboard view.
 
 ## Contents
 
@@ -35,6 +35,12 @@ This is the contents of the published config file:
 
 ```php
 return [
+    'table_prefix' => 'crm_',
+    'drivers' => [
+        'database' => [
+            'connection' => env('CRM_DB_CONNECTION', env('DB_CONNECTION', 'sqlite')),
+        ],
+    ],
 ];
 ```
 
@@ -54,9 +60,26 @@ php artisan vendor:publish --tag="laravel-crm-views"
 ## Usage
 
 ```php
-$crm = new Centrex\Crm();
-echo $crm->echoPhrase('Hello, Centrex!');
+use Centrex\Crm\Crm;
+
+$crm = app(Crm::class);
+
+$lead = $crm->createLead([
+    'title' => 'ERP rollout for Alpine Foods',
+    'source' => 'website',
+    'value' => 150000,
+]);
+
+$deal = $crm->qualifyLead($lead, [
+    'expected_close_date' => now()->addMonth()->toDateString(),
+]);
+
+$crm->advanceDealStage($deal, 'proposal');
+
+$summary = $crm->getPipelineSummary();
 ```
+
+When web routes are enabled, the package also exposes a simple `/crm` dashboard.
 
 ## Testing
 

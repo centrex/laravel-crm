@@ -1,6 +1,6 @@
 {
     "name": "centrex/laravel-crm",
-    "description": "This is my package laravel-crm",
+    "description": "Core CRM package for companies, contacts, leads, deals, and activities",
     "keywords": [
         "centrex",
         "laravel",
@@ -60,14 +60,14 @@
             "@composer run build",
             "@php vendor/bin/testbench serve"
         ],
-        "analyse": "vendor/bin/phpstan analyse",
-        "test-coverage": "vendor/bin/pest --coverage",
-        "refacto": "rector",
-        "lint": "pint",
-        "test:refacto": "rector --dry-run",
-        "test:lint": "pint --test",
-        "test:types": "phpstan analyse",
-        "test:unit": "pest -p",
+        "analyse": "@php vendor/phpstan/phpstan/phpstan analyse",
+        "test-coverage": "@php vendor/pestphp/pest/bin/pest --coverage",
+        "refacto": "@php vendor/rector/rector/bin/rector",
+        "lint": "@php vendor/laravel/pint/builds/pint",
+        "test:refacto": "@php vendor/rector/rector/bin/rector --dry-run",
+        "test:lint": "@php vendor/laravel/pint/builds/pint --test",
+        "test:types": "@php vendor/phpstan/phpstan/phpstan analyse",
+        "test:unit": "@php vendor/pestphp/pest/bin/pest -p",
         "test": [
             "@test:refacto",
             "@test:lint",

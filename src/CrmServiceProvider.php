@@ -4,64 +4,78 @@ declare(strict_types = 1);
 
 namespace Centrex\Crm;
 
+use Centrex\Crm\Commands\CrmCommand;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class CrmServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap the application services.
-     */
-    public function boot()
+    public function boot(): void
     {
-        /*
-         * Optional methods to load your package assets
-         */
-        // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'laravel-crm');
-        // $this->loadViewsFrom(__DIR__.'/../resources/views', 'laravel-crm');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        // $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'crm');
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
+        if ((bool) config('crm.web_enabled', true)) {
+            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        }
+
+        $this->registerGates();
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/config.php' => config_path('laravel-crm.php'),
+                __DIR__ . '/../config/config.php' => config_path('crm.php'),
             ], 'laravel-crm-config');
 
-            // Publishing the migrations.
-            /*$this->publishes([
-                __DIR__.'/../database/migrations/' => database_path('migrations')
-            ], 'laravel-crm-migrations');*/
+            $this->publishes([
+                __DIR__ . '/../database/migrations/' => database_path('migrations'),
+            ], 'laravel-crm-migrations');
 
-            // Publishing the views.
-            /*$this->publishes([
-                __DIR__.'/../resources/views' => resource_path('views/vendor/laravel-crm'),
-            ], 'laravel-crm-views');*/
+            $this->publishes([
+                __DIR__ . '/../resources/views' => resource_path('views/vendor/crm'),
+            ], 'laravel-crm-views');
 
-            // Publishing assets.
-            /*$this->publishes([
-                __DIR__.'/../resources/assets' => public_path('vendor/laravel-crm'),
-            ], 'laravel-crm-assets');*/
-
-            // Publishing the translation files.
-            /*$this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/laravel-crm'),
-            ], 'laravel-crm-lang');*/
-
-            // Registering package commands.
-            // $this->commands([]);
+            $this->commands([
+                CrmCommand::class,
+            ]);
         }
     }
 
-    /**
-     * Register the application services.
-     */
-    public function register()
+    public function register(): void
     {
-        // Automatically apply the package configuration
-        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'laravel-crm');
+        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'crm');
 
-        // Register the main class to use with the facade
-        $this->app->singleton('laravel-crm', function () {
-            return new Crm();
-        });
+        $this->app->singleton('crm', fn (): Crm => new Crm());
+        $this->app->singleton(Crm::class, fn (): Crm => new Crm());
+    }
+
+    protected function registerGates(): void
+    {
+        $abilities = [
+            'crm.dashboard.view',
+            'crm.leads.view',
+            'crm.leads.manage',
+            'crm.deals.view',
+            'crm.deals.manage',
+            'crm.activities.view',
+            'crm.activities.manage',
+        ];
+
+        foreach ($abilities as $ability) {
+            if (!Gate::has($ability)) {
+                Gate::define($ability, static function ($user): bool {
+                    if (Gate::has('crm-admin') && Gate::forUser($user)->check('crm-admin')) {
+                        return true;
+                    }
+
+                    $roleAttribute = config('crm.admin_role_attribute');
+
+                    if ($roleAttribute && method_exists($user, 'hasRole')) {
+                        return $user->hasRole(config('crm.admin_roles', []));
+                    }
+
+                    return false;
+                });
+            }
+        }
     }
 }
