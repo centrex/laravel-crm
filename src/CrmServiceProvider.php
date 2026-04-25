@@ -6,6 +6,7 @@ namespace Centrex\Crm;
 
 use Centrex\Crm\Commands\{CalculateClvCommand, CrmCommand, ScoreLeadsCommand};
 use Centrex\Crm\Services\ClvCalculator;
+use Centrex\Crm\Support\EmailSettings;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,6 +26,7 @@ class CrmServiceProvider extends ServiceProvider
         }
 
         $this->registerGates();
+        EmailSettings::apply();
 
         if ($this->app->runningInConsole()) {
             $this->publishes([

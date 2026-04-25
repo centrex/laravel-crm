@@ -3,6 +3,7 @@
 declare(strict_types = 1);
 
 use Centrex\Crm\Crm;
+use Centrex\Crm\Http\Controllers\EmailSettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(config('crm.web_middleware', ['web', 'auth']))
@@ -20,4 +21,7 @@ Route::middleware(config('crm.web_middleware', ['web', 'auth']))
                 'clvLeaderboard'     => $crm->getClvLeaderboard(5),
             ]);
         })->name('dashboard');
+
+        Route::get('/email-settings', [EmailSettingsController::class, 'edit'])->name('email-settings.edit');
+        Route::post('/email-settings', [EmailSettingsController::class, 'update'])->name('email-settings.update');
     });

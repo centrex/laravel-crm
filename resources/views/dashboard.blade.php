@@ -75,12 +75,17 @@
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">CRM Dashboard</h2>
                 <p class="mt-1 text-sm text-gray-500">Pipeline overview, activities, CLV insights, and revenue forecast.</p>
             </div>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('crm.email-settings.edit') }}" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:border-indigo-200 hover:text-indigo-700">
+                    Email settings
+                </a>
             @if ($overdueCount > 0)
                 <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
                     <span class="h-2 w-2 rounded-full bg-red-500"></span>
                     {{ $overdueCount }} overdue {{ Str::plural('activity', $overdueCount) }}
                 </span>
             @endif
+            </div>
         </div>
     </x-slot>
 

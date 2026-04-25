@@ -35,4 +35,15 @@ return [
     'clv_horizon_months' => env('CRM_CLV_HORIZON_MONTHS', 12),
 
     'clv_discount_rate' => env('CRM_CLV_DISCOUNT_RATE', 0.1),
+
+    'email' => [
+        'enabled'             => env('CRM_EMAIL_ENABLED', true),
+        'from_address'        => env('CRM_EMAIL_FROM_ADDRESS', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+        'from_name'           => env('CRM_EMAIL_FROM_NAME', env('MAIL_FROM_NAME', 'CRM')),
+        'reply_to'            => env('CRM_EMAIL_REPLY_TO', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+        'default_owner_email' => env('CRM_EMAIL_DEFAULT_OWNER', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+        'lead_subject'        => env('CRM_EMAIL_LEAD_SUBJECT', 'New CRM lead assigned'),
+        'deal_subject'        => env('CRM_EMAIL_DEAL_SUBJECT', 'CRM deal update'),
+        'activity_subject'    => env('CRM_EMAIL_ACTIVITY_SUBJECT', 'CRM activity reminder'),
+    ],
 ];
