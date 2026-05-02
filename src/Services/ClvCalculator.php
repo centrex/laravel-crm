@@ -19,12 +19,10 @@ class ClvCalculator
             return $this->emptyResult($horizonMonths);
         }
 
-        $normalized = array_map(function (array $t): array {
-            return [
-                'date'   => $t['date'] instanceof Carbon ? $t['date'] : Carbon::parse($t['date']),
-                'amount' => (float) $t['amount'],
-            ];
-        }, $transactions);
+        $normalized = array_map(fn(array $t): array => [
+            'date'   => $t['date'] instanceof Carbon ? $t['date'] : Carbon::parse($t['date']),
+            'amount' => (float) $t['amount'],
+        ], $transactions);
 
         usort($normalized, static fn (array $a, array $b): int => $a['date']->lt($b['date']) ? -1 : 1);
 
@@ -41,7 +39,7 @@ class ClvCalculator
         $daysSinceLast = (float) $last->diffInDays($now);
 
         $avgInterval = $frequency > 0 ? $ageDays / $frequency : $ageDays;
-        $pAlive = (float) exp(-$daysSinceLast / max(1.0, $avgInterval * 2.0));
+        $pAlive = exp(-$daysSinceLast / max(1.0, $avgInterval * 2.0));
         $pAlive = min(1.0, max(0.01, $pAlive));
 
         $monthlyRevenue = $totalRevenue / ($ageDays / 30.44);

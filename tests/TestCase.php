@@ -15,17 +15,19 @@ class TestCase extends Orchestra
 {
     use RefreshDatabase;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Centrex\\Crm\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
+            fn (string $modelName): string => 'Centrex\\Crm\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
         );
 
         $this->artisan('migrate', ['--database' => 'testing'])->run();
     }
 
+    #[\Override]
     protected function getPackageProviders($app)
     {
         return [
@@ -33,6 +35,7 @@ class TestCase extends Orchestra
         ];
     }
 
+    #[\Override]
     public function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');

@@ -11,6 +11,7 @@ class EmailSetting extends Model
 {
     use AddTablePrefix;
 
+    #[\Override]
     protected function getTableSuffix(): string
     {
         return 'email_settings';

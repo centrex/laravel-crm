@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\{Cache, Config, Schema};
 
 final class EmailSettings
 {
-    private const CACHE_KEY = 'crm.email_settings';
+    private const string CACHE_KEY = 'crm.email_settings';
 
     /** @return array<string, mixed> */
     public static function data(): array

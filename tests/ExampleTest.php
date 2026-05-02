@@ -7,7 +7,7 @@ use Centrex\Crm\Enums\{ActivityType, DealStage, LeadSource, LeadStatus};
 use Centrex\Crm\Exceptions\{InvalidDealStageTransition, InvalidLeadStatusTransition};
 use Centrex\Crm\Models\{ClvSnapshot, Company, Contact, Deal};
 
-it('creates and qualifies a lead into a deal', function () {
+it('creates and qualifies a lead into a deal', function (): void {
     $crm = app(Crm::class);
 
     $lead = $crm->createLead([
@@ -26,7 +26,7 @@ it('creates and qualifies a lead into a deal', function () {
         ->and((float) $deal->amount)->toBe(150000.0);
 });
 
-it('can move a deal through the default pipeline', function () {
+it('can move a deal through the default pipeline', function (): void {
     $crm = app(Crm::class);
     $lead = $crm->createLead([
         'title' => 'Warehouse digitization',
@@ -43,7 +43,7 @@ it('can move a deal through the default pipeline', function () {
         ->and($wonDeal->won_at)->not->toBeNull();
 });
 
-it('rejects invalid lead and deal transitions', function () {
+it('rejects invalid lead and deal transitions', function (): void {
     $crm = app(Crm::class);
     $lead = $crm->createLead([
         'title' => 'Support retainer',
@@ -65,7 +65,7 @@ it('rejects invalid lead and deal transitions', function () {
         ->toThrow(InvalidDealStageTransition::class);
 });
 
-it('summarises pipeline value and logs activities', function () {
+it('summarises pipeline value and logs activities', function (): void {
     $crm = app(Crm::class);
 
     $leadA = $crm->createLead([
@@ -100,7 +100,7 @@ it('summarises pipeline value and logs activities', function () {
         ->and($stages['proposal']['count'])->toBe(1);
 });
 
-it('supports tags on companies, contacts, leads, and deals', function () {
+it('supports tags on companies, contacts, leads, and deals', function (): void {
     $company = Company::factory()->create();
     $contact = Contact::factory()->create();
     $crm = app(Crm::class);
@@ -116,7 +116,7 @@ it('supports tags on companies, contacts, leads, and deals', function () {
         ->and($lead->tags)->toHaveCount(2);
 });
 
-it('calculates CLV for a contact with won deals', function () {
+it('calculates CLV for a contact with won deals', function (): void {
     $crm = app(Crm::class);
     $contact = Contact::factory()->create();
 
@@ -136,7 +136,7 @@ it('calculates CLV for a contact with won deals', function () {
         ->and($snapshot->frequency)->toBeGreaterThanOrEqual(0);
 });
 
-it('returns zero CLV for contacts with no won deals', function () {
+it('returns zero CLV for contacts with no won deals', function (): void {
     $crm = app(Crm::class);
     $contact = Contact::factory()->create();
 
@@ -146,7 +146,7 @@ it('returns zero CLV for contacts with no won deals', function () {
         ->and($snapshot->frequency)->toBe(0);
 });
 
-it('scores a lead based on value, source, and activity', function () {
+it('scores a lead based on value, source, and activity', function (): void {
     $crm = app(Crm::class);
 
     $lead = $crm->createLead([
@@ -167,7 +167,7 @@ it('scores a lead based on value, source, and activity', function () {
     expect($scored->score)->toBeGreaterThan(50);
 });
 
-it('returns conversion rates', function () {
+it('returns conversion rates', function (): void {
     $crm = app(Crm::class);
 
     $openLead = $crm->createLead(['title' => 'Open', 'value' => 10000]);
@@ -187,7 +187,7 @@ it('returns conversion rates', function () {
         ->and($rates['deal_win_rate'])->toBeGreaterThan(0.0);
 });
 
-it('retrieves overdue and upcoming activities', function () {
+it('retrieves overdue and upcoming activities', function (): void {
     $crm = app(Crm::class);
 
     $lead = $crm->createLead(['title' => 'Activity test', 'value' => 20000]);
@@ -210,7 +210,7 @@ it('retrieves overdue and upcoming activities', function () {
         ->and($upcoming)->toHaveCount(2);
 });
 
-it('can attach activities to companies and contacts via HasActivities', function () {
+it('can attach activities to companies and contacts via HasActivities', function (): void {
     $crm = app(Crm::class);
     $company = Company::factory()->create();
     $contact = Contact::factory()->create();
@@ -223,7 +223,7 @@ it('can attach activities to companies and contacts via HasActivities', function
         ->and($company->activities->first()->subject)->toBeInstanceOf(Company::class);
 });
 
-it('searches contacts and companies', function () {
+it('searches contacts and companies', function (): void {
     $crm = app(Crm::class);
 
     Contact::factory()->create(['first_name' => 'Alice', 'last_name' => 'Walker', 'email' => 'alice@example.com']);

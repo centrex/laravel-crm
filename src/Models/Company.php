@@ -16,6 +16,7 @@ class Company extends Model
     use HasTags;
     use SoftDeletes;
 
+    #[\Override]
     protected function getTableSuffix(): string
     {
         return 'companies';

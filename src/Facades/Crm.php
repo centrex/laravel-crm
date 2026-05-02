@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Facade;
  */
 class Crm extends Facade
 {
+    #[\Override]
     protected static function getFacadeAccessor()
     {
         return 'crm';

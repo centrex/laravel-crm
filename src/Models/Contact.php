@@ -16,6 +16,7 @@ class Contact extends Model
     use HasTags;
     use SoftDeletes;
 
+    #[\Override]
     protected function getTableSuffix(): string
     {
         return 'contacts';

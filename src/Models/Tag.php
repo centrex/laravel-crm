@@ -12,6 +12,7 @@ class Tag extends Model
 {
     use AddTablePrefix;
 
+    #[\Override]
     protected function getTableSuffix(): string
     {
         return 'tags';

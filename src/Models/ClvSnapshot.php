@@ -12,6 +12,7 @@ class ClvSnapshot extends Model
 {
     use AddTablePrefix;
 
+    #[\Override]
     protected function getTableSuffix(): string
     {
         return 'clv_snapshots';

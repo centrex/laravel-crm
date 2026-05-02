@@ -13,6 +13,7 @@ class Activity extends Model
 {
     use AddTablePrefix;
 
+    #[\Override]
     protected function getTableSuffix(): string
     {
         return 'activities';

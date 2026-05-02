@@ -49,6 +49,7 @@ class CrmServiceProvider extends ServiceProvider
         }
     }
 
+    #[\Override]
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'crm');
