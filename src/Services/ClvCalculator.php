@@ -19,7 +19,7 @@ class ClvCalculator
             return $this->emptyResult($horizonMonths);
         }
 
-        $normalized = array_map(fn(array $t): array => [
+        $normalized = array_map(fn (array $t): array => [
             'date'   => $t['date'] instanceof Carbon ? $t['date'] : Carbon::parse($t['date']),
             'amount' => (float) $t['amount'],
         ], $transactions);
