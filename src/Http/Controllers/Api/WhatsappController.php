@@ -95,7 +95,7 @@ class WhatsappController extends Controller
      */
     public function storeTemplate(StoreWhatsappTemplateRequest $request): JsonResponse
     {
-        $data              = $request->validated();
+        $data = $request->validated();
         $data['is_active'] = (bool) ($data['is_active'] ?? true);
 
         $template = $this->whatsapp->saveTemplate($data);
@@ -109,9 +109,9 @@ class WhatsappController extends Controller
      */
     public function updateTemplate(StoreWhatsappTemplateRequest $request, WhatsappTemplate $template): JsonResponse
     {
-        $data              = $request->validated();
+        $data = $request->validated();
         $data['is_active'] = (bool) ($data['is_active'] ?? $template->is_active);
-        $data['id']        = $template->id;
+        $data['id'] = $template->id;
 
         $template = $this->whatsapp->saveTemplate($data);
 

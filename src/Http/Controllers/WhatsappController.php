@@ -19,9 +19,9 @@ class WhatsappController extends Controller
     /** Compose form — pick contacts, choose template, preview message. */
     public function compose(Request $request): View
     {
-        $contacts  = Contact::query()->with('company')->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'phone', 'company_id']);
+        $contacts = Contact::query()->with('company')->orderBy('first_name')->get(['id', 'first_name', 'last_name', 'phone', 'company_id']);
         $templates = WhatsappTemplate::query()->where('is_active', true)->orderBy('name')->get();
-        $types     = WhatsappMessageType::cases();
+        $types = WhatsappMessageType::cases();
 
         $preselected = $request->query('contact_id');
 
@@ -62,7 +62,7 @@ class WhatsappController extends Controller
     public function templates(): View
     {
         $templates = WhatsappTemplate::query()->orderBy('name')->paginate(20);
-        $types     = WhatsappMessageType::cases();
+        $types = WhatsappMessageType::cases();
 
         return view('crm::whatsapp.templates', compact('templates', 'types'));
     }
@@ -70,7 +70,7 @@ class WhatsappController extends Controller
     /** Store a new template. */
     public function storeTemplate(StoreWhatsappTemplateRequest $request): RedirectResponse
     {
-        $data              = $request->validated();
+        $data = $request->validated();
         $data['is_active'] = (bool) ($data['is_active'] ?? true);
 
         $this->whatsapp->saveTemplate($data);

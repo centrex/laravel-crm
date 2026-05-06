@@ -7,9 +7,9 @@ namespace Centrex\Crm\Enums;
 enum WhatsappMessageType: string
 {
     case ProductUpdate = 'product_update';
-    case Offer         = 'offer';
-    case FollowUp      = 'follow_up';
-    case Custom        = 'custom';
+    case Offer = 'offer';
+    case FollowUp = 'follow_up';
+    case Custom = 'custom';
 
     public function label(): string
     {
