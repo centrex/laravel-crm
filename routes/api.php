@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-use Centrex\Crm\Http\Controllers\Api\{ActivityController, ClvController, CompanyController, ContactController, DealController, LeadController};
+use Centrex\Crm\Http\Controllers\Api\{ActivityController, ClvController, CompanyController, ContactController, DealController, LeadController, WhatsappController};
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(config('crm.api_middleware', ['api', 'auth:sanctum']))
@@ -22,6 +22,15 @@ Route::middleware(config('crm.api_middleware', ['api', 'auth:sanctum']))
 
         Route::apiResource('activities', ActivityController::class);
         Route::post('activities/{activity}/complete', [ActivityController::class, 'complete'])->name('activities.complete');
+
+        // WhatsApp
+        Route::post('whatsapp/send', [WhatsappController::class, 'send'])->name('whatsapp.send');
+        Route::get('whatsapp/messages', [WhatsappController::class, 'messages'])->name('whatsapp.messages');
+        Route::post('whatsapp/messages/{message}/open', [WhatsappController::class, 'markOpened'])->name('whatsapp.messages.open');
+        Route::get('whatsapp/templates', [WhatsappController::class, 'listTemplates'])->name('whatsapp.templates.index');
+        Route::post('whatsapp/templates', [WhatsappController::class, 'storeTemplate'])->name('whatsapp.templates.store');
+        Route::put('whatsapp/templates/{template}', [WhatsappController::class, 'updateTemplate'])->name('whatsapp.templates.update');
+        Route::delete('whatsapp/templates/{template}', [WhatsappController::class, 'destroyTemplate'])->name('whatsapp.templates.destroy');
 
         Route::get('contacts/{contact}/clv', [ClvController::class, 'show'])->name('contacts.clv.show');
         Route::post('contacts/{contact}/clv/recalculate', [ClvController::class, 'recalculate'])->name('contacts.clv.recalculate');

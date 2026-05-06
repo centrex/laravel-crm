@@ -59,7 +59,8 @@
         'email'   => 'M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75',
         'meeting' => 'M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5',
         'task'    => 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
-        'note'    => 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z',
+        'note'      => 'M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z',
+        'whatsapp'  => 'M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z',
     ];
 
     $maxDealAmount = collect($dealsByStage)->max('amount') ?: 1;
@@ -76,6 +77,10 @@
                 <p class="mt-1 text-sm text-gray-500">Pipeline overview, activities, CLV insights, and revenue forecast.</p>
             </div>
             <div class="flex items-center gap-3">
+                <a href="{{ route('crm.whatsapp.compose') }}" class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-700">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.126 1.534 5.87L0 24l6.305-1.517A11.955 11.955 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.032-1.383l-.36-.214-3.742.9.934-3.649-.234-.374A9.818 9.818 0 1 1 12 21.818z"/></svg>
+                    WhatsApp
+                </a>
                 <a href="{{ route('crm.email-settings.edit') }}" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:border-indigo-200 hover:text-indigo-700">
                     Email settings
                 </a>
@@ -291,6 +296,95 @@
                     @endif
                 </div>
             @endif
+
+            {{-- WhatsApp Panel --}}
+            @php
+                $wa = $whatsappStats ?? ['total' => 0, 'sent_today' => 0, 'pending' => 0, 'opened' => 0, 'recent' => collect()];
+                $waTypeColors = [
+                    'product_update' => 'bg-blue-100 text-blue-700',
+                    'offer'          => 'bg-yellow-100 text-yellow-700',
+                    'follow_up'      => 'bg-purple-100 text-purple-700',
+                    'custom'         => 'bg-gray-100 text-gray-600',
+                ];
+            @endphp
+            <div class="rounded-2xl border border-green-100 bg-white p-6 shadow-sm">
+                <div class="mb-5 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-green-600">
+                            <svg class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.126 1.534 5.87L0 24l6.305-1.517A11.955 11.955 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.032-1.383l-.36-.214-3.742.9.934-3.649-.234-.374A9.818 9.818 0 1 1 12 21.818z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-semibold text-gray-900">WhatsApp Outreach</h3>
+                            <p class="text-xs text-gray-400">Product updates &amp; offers via WhatsApp Web</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ route('crm.whatsapp.history') }}" class="text-xs font-medium text-green-600 hover:underline">History</a>
+                        <a href="{{ route('crm.whatsapp.compose') }}" class="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700">
+                            + Compose
+                        </a>
+                    </div>
+                </div>
+
+                {{-- WhatsApp KPIs --}}
+                <div class="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                    @foreach ([
+                        ['label' => 'Total Sent',   'value' => $wa['total'],      'color' => 'text-gray-800'],
+                        ['label' => 'Today',         'value' => $wa['sent_today'], 'color' => 'text-green-700'],
+                        ['label' => 'Pending',       'value' => $wa['pending'],    'color' => 'text-yellow-600'],
+                        ['label' => 'Opened',        'value' => $wa['opened'],     'color' => 'text-emerald-700'],
+                    ] as $wk)
+                        <div class="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3 text-center">
+                            <p class="text-xl font-bold {{ $wk['color'] }}">{{ $wk['value'] }}</p>
+                            <p class="mt-0.5 text-xs text-gray-400">{{ $wk['label'] }}</p>
+                        </div>
+                    @endforeach
+                </div>
+
+                {{-- Recent messages --}}
+                @if ($wa['recent']->isEmpty())
+                    <div class="rounded-xl border border-dashed border-green-200 py-10 text-center">
+                        <p class="text-sm text-gray-400">No WhatsApp messages yet.</p>
+                        <a href="{{ route('crm.whatsapp.compose') }}" class="mt-2 inline-block text-sm font-medium text-green-600 hover:underline">
+                            Send your first product update or offer →
+                        </a>
+                    </div>
+                @else
+                    <div class="space-y-2">
+                        @foreach ($wa['recent'] as $msg)
+                            <div class="flex items-center gap-3 rounded-xl border border-gray-100 px-4 py-2.5">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <p class="truncate text-sm font-medium text-gray-800">
+                                            {{ $msg->contact?->full_name ?? $msg->phone }}
+                                        </p>
+                                        <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium {{ $waTypeColors[$msg->type->value] ?? 'bg-gray-100 text-gray-600' }}">
+                                            {{ $msg->type->label() }}
+                                        </span>
+                                    </div>
+                                    <p class="mt-0.5 truncate text-xs text-gray-400">{{ $msg->message_body }}</p>
+                                </div>
+                                <div class="shrink-0 text-right">
+                                    @if ($msg->status === 'opened')
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Opened
+                                        </span>
+                                    @else
+                                        <a href="{{ route('crm.whatsapp.open', $msg) }}" target="_blank"
+                                           class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 hover:bg-green-200">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>Open
+                                        </a>
+                                    @endif
+                                    <p class="mt-0.5 text-xs text-gray-300">{{ $msg->created_at->diffForHumans() }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
 
             {{-- Revenue Forecast + CLV Leaderboard --}}
             <div class="grid gap-6 lg:grid-cols-[1fr_1fr]">

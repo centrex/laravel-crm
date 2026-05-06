@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Centrex\Crm;
 
 use Centrex\Crm\Commands\{CalculateClvCommand, CrmCommand, ScoreLeadsCommand};
-use Centrex\Crm\Services\ClvCalculator;
+use Centrex\Crm\Services\{ClvCalculator, WhatsappService};
 use Centrex\Crm\Support\EmailSettings;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -58,6 +58,7 @@ class CrmServiceProvider extends ServiceProvider
 
         $this->app->singleton('crm', fn (): Crm => new Crm($this->app->make(ClvCalculator::class)));
         $this->app->singleton(Crm::class, fn (): Crm => new Crm($this->app->make(ClvCalculator::class)));
+        $this->app->singleton(WhatsappService::class, fn (): WhatsappService => new WhatsappService());
     }
 
     protected function registerGates(): void
@@ -75,6 +76,8 @@ class CrmServiceProvider extends ServiceProvider
             'crm.activities.view',
             'crm.activities.manage',
             'crm.clv.view',
+            'crm.whatsapp.view',
+            'crm.whatsapp.send',
         ];
 
         foreach ($abilities as $ability) {

@@ -4,17 +4,20 @@ declare(strict_types = 1);
 
 namespace Centrex\Crm;
 
-use Centrex\Crm\Enums\{DealStage, LeadSource, LeadStatus};
+use Centrex\Crm\Enums\{DealStage, LeadSource, LeadStatus, WhatsappMessageType};
 use Centrex\Crm\Exceptions\{InvalidDealStageTransition, InvalidLeadStatusTransition};
-use Centrex\Crm\Models\{Activity, ClvSnapshot, Contact, Deal, Lead};
-use Centrex\Crm\Services\ClvCalculator;
+use Centrex\Crm\Models\{Activity, ClvSnapshot, Contact, Deal, Lead, WhatsappMessage, WhatsappTemplate};
+use Centrex\Crm\Services\{ClvCalculator, WhatsappService};
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\{DB, Schema};
 
 class Crm
 {
-    public function __construct(private readonly ClvCalculator $clvCalculator = new ClvCalculator()) {}
+    public function __construct(
+        private readonly ClvCalculator $clvCalculator = new ClvCalculator(),
+        private readonly WhatsappService $whatsapp = new WhatsappService(),
+    ) {}
 
     /* -------------------------
      * Lead lifecycle
@@ -391,6 +394,104 @@ class Crm
             ->where('due_at', '<', now())
             ->orderBy('due_at')
             ->get();
+    }
+
+    /* -------------------------
+     * WhatsApp messaging
+     * ------------------------- */
+
+    /**
+     * Send a WhatsApp message to a contact via WhatsApp Web (wa.me link).
+     * Returns the WhatsappMessage record with a ready wa_url.
+     */
+    public function sendWhatsapp(
+        Contact $contact,
+        string $messageBody,
+        WhatsappMessageType $type = WhatsappMessageType::Custom,
+        ?int $templateId = null,
+        ?int $sentBy = null,
+    ): WhatsappMessage {
+        return $this->whatsapp->createMessage(
+            phone: $contact->phone ?? '',
+            messageBody: $messageBody,
+            type: $type,
+            contactId: $contact->id,
+            templateId: $templateId,
+            sentBy: $sentBy,
+        );
+    }
+
+    /**
+     * Bulk-prepare WhatsApp messages for multiple contacts.
+     *
+     * @param  array<int>  $contactIds
+     * @return Collection<int, WhatsappMessage>
+     */
+    public function bulkWhatsapp(
+        array $contactIds,
+        string $messageBody,
+        WhatsappMessageType $type = WhatsappMessageType::Custom,
+        ?int $templateId = null,
+        ?int $sentBy = null,
+    ): Collection {
+        return $this->whatsapp->bulkPrepare(
+            contactIds: $contactIds,
+            rawMessageBody: $messageBody,
+            type: $type,
+            templateId: $templateId,
+            sentBy: $sentBy,
+        );
+    }
+
+    /**
+     * Build a standalone wa.me link without storing a record.
+     */
+    public function buildWhatsappUrl(string $phone, string $message): string
+    {
+        return $this->whatsapp->buildWaUrl($phone, $message);
+    }
+
+    /** @return Collection<int, WhatsappTemplate> */
+    public function whatsappTemplates(?WhatsappMessageType $type = null): Collection
+    {
+        return $this->whatsapp->templates($type);
+    }
+
+    /**
+     * Stats for the CRM dashboard WhatsApp panel.
+     *
+     * @return array{total: int, sent_today: int, pending: int, opened: int, recent: Collection<int, WhatsappMessage>}
+     */
+    public function getWhatsappStats(): array
+    {
+        $tableExists = $this->whatsappTableExists();
+
+        if (!$tableExists) {
+            return ['total' => 0, 'sent_today' => 0, 'pending' => 0, 'opened' => 0, 'recent' => collect()];
+        }
+
+        return [
+            'total'      => WhatsappMessage::query()->count(),
+            'sent_today' => WhatsappMessage::query()->whereDate('created_at', today())->count(),
+            'pending'    => WhatsappMessage::query()->where('status', 'pending')->count(),
+            'opened'     => WhatsappMessage::query()->where('status', 'opened')->count(),
+            'recent'     => WhatsappMessage::query()
+                ->with(['contact.company', 'template'])
+                ->orderByDesc('created_at')
+                ->limit(5)
+                ->get(),
+        ];
+    }
+
+    private function whatsappTableExists(): bool
+    {
+        try {
+            $model = new WhatsappMessage();
+
+            return Schema::connection($model->getConnectionName())->hasTable($model->getTable());
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     /* -------------------------

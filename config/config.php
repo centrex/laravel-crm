@@ -36,6 +36,11 @@ return [
 
     'clv_discount_rate' => env('CRM_CLV_DISCOUNT_RATE', 0.1),
 
+    'whatsapp' => [
+        'enabled'         => env('CRM_WHATSAPP_ENABLED', true),
+        'default_country' => env('CRM_WHATSAPP_COUNTRY_CODE', '880'), // BD country code
+    ],
+
     'email' => [
         'enabled'             => env('CRM_EMAIL_ENABLED', true),
         'from_address'        => env('CRM_EMAIL_FROM_ADDRESS', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
