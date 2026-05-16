@@ -15,13 +15,13 @@ return [
 
     'web_prefix' => env('CRM_WEB_PREFIX', 'crm'),
 
-    'web_middleware' => ['web', 'auth'],
+    'web_middleware' => ['web', 'auth', 'can:crm.dashboard.view'],
 
     'api_enabled' => env('CRM_API_ENABLED', true),
 
     'api_prefix' => env('CRM_API_PREFIX', 'api/crm'),
 
-    'api_middleware' => ['api', 'auth:sanctum'],
+    'api_middleware' => ['api', 'auth:sanctum', 'can:crm.dashboard.view'],
 
     'user_foreign_keys' => env('CRM_USER_FOREIGN_KEYS', false),
 
