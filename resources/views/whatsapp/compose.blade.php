@@ -69,11 +69,11 @@
                     <div>
                         <label class="mb-2 block text-sm font-medium text-gray-700">
                             Message body
-                            <span class="ml-1 font-normal text-gray-400 text-xs">— use {{'{{'}}name{{'}}'}}, {{'{{'}}company{{'}}'}}, {{'{{'}}product{{'}}'}}, {{'{{'}}offer{{'}}'}}, {{'{{'}}price{{'}}'}}, {{'{{'}}message{{'}}'}}, {{'{{'}}sender{{'}}'}}</span>
+                            <span class="ml-1 font-normal text-gray-400 text-xs">— use @{{name}}, @{{company}}, @{{product}}, @{{offer}}, @{{price}}, @{{message}}, @{{sender}}</span>
                         </label>
                         <textarea name="message_body" x-model="messageBody" rows="10"
                                   class="w-full rounded-xl border border-gray-200 px-4 py-3 font-mono text-sm outline-none transition focus:border-green-400"
-                                  placeholder="Hi {{'{{'}}name{{'}}'}}, we have a special offer..."></textarea>
+                                  placeholder="Hi @{{name}}, we have a special offer..."></textarea>
                         @error('message_body')
                             <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                         @enderror
@@ -153,6 +153,14 @@
         </div>
     </div>
 
+    @php
+        $contactsData = $contacts->map(fn ($c) => [
+            'id'      => $c->id,
+            'name'    => $c->full_name,
+            'phone'   => $c->phone,
+            'company' => $c->company?->name ?? '',
+        ]);
+    @endphp
     <script>
         function whatsappCompose() {
             return {
@@ -161,7 +169,7 @@
                 messageBody: `{{ old('message_body', '') }}`,
                 search: '',
                 selectedContacts: @json(array_map('intval', (array) $preselected)),
-                contacts: @json($contacts->map(fn ($c) => ['id' => $c->id, 'name' => $c->full_name, 'phone' => $c->phone, 'company' => $c->company?->name ?? ''])),
+                contacts: @json($contactsData),
                 templates: @json($templates->keyBy('id')),
 
                 init() {

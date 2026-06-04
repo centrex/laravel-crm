@@ -120,11 +120,11 @@
                             <label class="block">
                                 <span class="mb-1.5 block text-sm font-medium text-gray-700">
                                     Message body
-                                    <span class="ml-1 font-normal text-gray-400 text-xs">{{'{{'}}name{{'}}'}}, {{'{{'}}company{{'}}'}}, {{'{{'}}product{{'}}'}}, {{'{{'}}offer{{'}}'}}, {{'{{'}}price{{'}}'}}, {{'{{'}}message{{'}}'}}, {{'{{'}}sender{{'}}'}}</span>
+                                    <span class="ml-1 font-normal text-gray-400 text-xs">@{{name}}, @{{company}}, @{{product}}, @{{offer}}, @{{price}}, @{{message}}, @{{sender}}</span>
                                 </span>
                                 <textarea name="message_body" rows="10"
                                           class="w-full rounded-xl border border-gray-200 px-4 py-3 font-mono text-sm outline-none transition focus:border-green-400"
-                                          placeholder="Hi {{'{{'}}name{{'}}'}},&#10;&#10;We have a great offer for you...">{{ old('message_body') }}</textarea>
+                                          placeholder="Hi @{{name}},&#10;&#10;We have a great offer for you...">{{ old('message_body') }}</textarea>
                                 @error('message_body')
                                     <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
                                 @enderror
