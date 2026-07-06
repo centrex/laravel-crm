@@ -78,6 +78,7 @@ class CrmServiceProvider extends ServiceProvider
             'crm.clv.view',
             'crm.whatsapp.view',
             'crm.whatsapp.send',
+            'crm.email-settings.manage',
         ];
 
         foreach ($abilities as $ability) {

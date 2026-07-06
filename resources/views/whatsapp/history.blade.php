@@ -6,9 +6,11 @@
                 <p class="mt-1 text-sm text-gray-500">All generated WhatsApp links — click Open to launch WhatsApp Web.</p>
             </div>
             <div class="flex gap-2">
+                @can('crm.whatsapp.send')
                 <a href="{{ route('crm.whatsapp.compose') }}" class="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-700">
                     + New Message
                 </a>
+                @endcan
                 <a href="{{ route('crm.dashboard') }}" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:border-indigo-200 hover:text-indigo-700">
                     ← CRM
                 </a>
@@ -39,6 +41,7 @@
                                         <p class="text-sm font-medium text-gray-800">{{ $msg->contact?->full_name ?? $msg->phone }}</p>
                                         <p class="text-xs text-gray-400">{{ $msg->phone }}</p>
                                     </div>
+                                    @can('crm.whatsapp.send')
                                     <a href="{{ route('crm.whatsapp.open', $msg) }}"
                                        target="_blank"
                                        class="flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700">
@@ -48,6 +51,7 @@
                                         </svg>
                                         Open in WhatsApp
                                     </a>
+                                    @endcan
                                 </div>
                             @endforeach
                         </div>
@@ -102,6 +106,7 @@
                                 </td>
                                 <td class="px-5 py-3 text-xs text-gray-400">{{ $msg->created_at->diffForHumans() }}</td>
                                 <td class="px-5 py-3">
+                                    @can('crm.whatsapp.send')
                                     <a href="{{ route('crm.whatsapp.open', $msg) }}"
                                        target="_blank"
                                        class="flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700 whitespace-nowrap">
@@ -111,13 +116,16 @@
                                         </svg>
                                         Open
                                     </a>
+                                    @endcan
                                 </td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="7" class="py-16 text-center text-sm text-gray-400">
                                     No WhatsApp messages yet.
+                                    @can('crm.whatsapp.send')
                                     <a href="{{ route('crm.whatsapp.compose') }}" class="ml-1 font-medium text-green-600 hover:underline">Send your first message →</a>
+                                    @endcan
                                 </td>
                             </tr>
                         @endforelse

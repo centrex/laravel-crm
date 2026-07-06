@@ -6,12 +6,16 @@
                 <p class="mt-1 text-sm text-gray-500">Compose a product update or offer and generate WhatsApp Web links for your contacts.</p>
             </div>
             <div class="flex gap-2">
+                @can('crm.whatsapp.send')
                 <a href="{{ route('crm.whatsapp.templates') }}" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:border-green-200 hover:text-green-700">
                     Templates
                 </a>
+                @endcan
+                @can('crm.whatsapp.view')
                 <a href="{{ route('crm.whatsapp.history') }}" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:border-green-200 hover:text-green-700">
                     History
                 </a>
+                @endcan
                 <a href="{{ route('crm.dashboard') }}" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:border-indigo-200 hover:text-indigo-700">
                     ← CRM
                 </a>

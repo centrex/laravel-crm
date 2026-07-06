@@ -77,13 +77,17 @@
                 <p class="mt-1 text-sm text-gray-500">Pipeline overview, activities, CLV insights, and revenue forecast.</p>
             </div>
             <div class="flex items-center gap-3">
+                @can('crm.whatsapp.send')
                 <a href="{{ route('crm.whatsapp.compose') }}" class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-green-700">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.126 1.534 5.87L0 24l6.305-1.517A11.955 11.955 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.032-1.383l-.36-.214-3.742.9.934-3.649-.234-.374A9.818 9.818 0 1 1 12 21.818z"/></svg>
                     WhatsApp
                 </a>
+                @endcan
+                @can('crm.email-settings.manage')
                 <a href="{{ route('crm.email-settings.edit') }}" class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:border-indigo-200 hover:text-indigo-700">
                     Email settings
                 </a>
+                @endcan
             @if ($overdueCount > 0)
                 <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
                     <span class="h-2 w-2 rounded-full bg-red-500"></span>
@@ -322,10 +326,14 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
+                        @can('crm.whatsapp.view')
                         <a href="{{ route('crm.whatsapp.history') }}" class="text-xs font-medium text-green-600 hover:underline">History</a>
+                        @endcan
+                        @can('crm.whatsapp.send')
                         <a href="{{ route('crm.whatsapp.compose') }}" class="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700">
                             + Compose
                         </a>
+                        @endcan
                     </div>
                 </div>
 
@@ -348,9 +356,11 @@
                 @if ($wa['recent']->isEmpty())
                     <div class="rounded-xl border border-dashed border-green-200 py-10 text-center">
                         <p class="text-sm text-gray-400">No WhatsApp messages yet.</p>
+                        @can('crm.whatsapp.send')
                         <a href="{{ route('crm.whatsapp.compose') }}" class="mt-2 inline-block text-sm font-medium text-green-600 hover:underline">
                             Send your first product update or offer →
                         </a>
+                        @endcan
                     </div>
                 @else
                     <div class="space-y-2">
@@ -373,10 +383,12 @@
                                             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Opened
                                         </span>
                                     @else
+                                        @can('crm.whatsapp.send')
                                         <a href="{{ route('crm.whatsapp.open', $msg) }}" target="_blank"
                                            class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 hover:bg-green-200">
                                             <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>Open
                                         </a>
+                                        @endcan
                                     @endif
                                     <p class="mt-0.5 text-xs text-gray-300">{{ $msg->created_at->diffForHumans() }}</p>
                                 </div>
